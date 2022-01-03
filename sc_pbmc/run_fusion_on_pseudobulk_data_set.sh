@@ -31,14 +31,12 @@ sed 1d $data_set_gene_summary_file | while read gene_id chrom_num tss gene_pheno
 	# Set OUT directory for this gene
 	OUT=$fusion_input_dir$data_set_name"_"$gene_id"_1KG_only_fusion_input"
 
-	echo ${LDREF_dir}1000G.EUR.$chrom_num.bim
 	# Run PLINK to set up gene for fusion
 	plink --bfile $PRE_GENO$chrom_num --pheno $gene_pheno_file --make-bed --out $OUT --keep $gene_pheno_file --chr $chrom_num --from-bp $p0 --to-bp $p1 --extract ${LDREF_dir}1000G.EUR.$chrom_num.snp_ids
-
 	# Set FINAL_OUT directory for this gene
 	FINAL_OUT=$fusion_output_dir$data_set_name"_"$gene_id"_1KG_only_fusion_output"
 	TMP=$fusion_output_dir$data_set_name"_"$gene_id"_1KG_only_fusion_temp_output"
-	Rscript $fusion_code_dir"FUSION.compute_weights.R" --bfile $OUT --hsq_p 0.01 --tmp $TMP --covar $covariate_file --out $FINAL_OUT --verbose 0 --save_hsq --PATH_gcta ${fusion_code_dir}"gcta_nr_robust" --models lasso
+	Rscript "FUSION_EDITED.compute_weight_sparsity.R" --bfile $OUT --hsq_p 0.01 --tmp $TMP --covar $covariate_file --out $FINAL_OUT --verbose 1 --crossval 0 --save_hsq --PATH_gcta ${fusion_code_dir}"gcta_nr_robust" --models lasso_fixed_lambda
 done
 
 
@@ -48,32 +46,4 @@ done
 
 
 
-###########
-# Old
-############
 
-if false; then
-PRE_GENO=$processed_genotype_dir"clues_immvar_donor_site_filter_merged_plink_chr_"
-
-module load R/3.5.1
-
-cis_window_size="500000"
-# Loop through lines (genes) of gene summary file while skipping header
-sed 1d $data_set_gene_summary_file | while read gene_id chrom_num tss gene_pheno_file covariate_file; do
-
-	# Get stand and end position of the cis window for this gene
-	p0="$(($tss - $cis_window_size))"
-	p1="$(($tss + $cis_window_size))"
-
-	# Set OUT directory for this gene
-	OUT=$fusion_input_dir$data_set_name"_"$gene_id"_fusion_input"
-
-	# Run PLINK to set up gene for fusion
-	plink --bfile $PRE_GENO$chrom_num --pheno $gene_pheno_file --make-bed --out $OUT --keep $gene_pheno_file --chr $chrom_num --from-bp $p0 --to-bp $p1
-
-	# Set FINAL_OUT directory for this gene
-	FINAL_OUT=$fusion_output_dir$data_set_name"_"$gene_id"_fusion_output"
-	TMP=$fusion_output_dir$data_set_name"_"$gene_id"_fusion_temp_output"
-	Rscript $fusion_code_dir"FUSION.compute_weights.R" --bfile $OUT --hsq_p 0.01 --tmp $TMP --covar $covariate_file --out $FINAL_OUT --verbose 0 --save_hsq --PATH_gcta ${fusion_code_dir}"gcta_nr_robust" --models lasso
-done
-fi
