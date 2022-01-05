@@ -102,9 +102,8 @@ if false; then
 sh organize_fusion_results.sh $data_set_summary_file $fusion_output_dir $fusion_processed_output_dir
 fi
 
-if false; then
 module load R/3.5.1
 Rscript visualize_fusion_results.R $data_set_summary_file $fusion_processed_output_dir $pseudobulk_expression_dir $fusion_visualization_dir
-fi
+
 
 

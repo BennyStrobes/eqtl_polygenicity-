@@ -25,6 +25,28 @@ def extract_fields_from_hsq_file(hsq_file):
 def convert_gene_fit_file_from_rdata_to_csv(gene_fit_file, new_gene_fit_file):
 	os.system('Rscript convert_fusion_weights_from_rdata_to_tsv.R ' + gene_fit_file + ' ' + new_gene_fit_file)
 
+def extract_fraction_non_zero_from_gene_fit(gene_fit_file, row_name):
+	f = open(gene_fit_file)
+	head_count = 0
+	fraction_non_zero = -10
+	for line in f:
+		line = line.rstrip()
+		data = line.split('\t')
+		if head_count == 0:
+			head_count = head_count + 1
+			continue
+		# error checking
+		if len(data) != 2:
+			print('assumption eroror')
+			pdb.set_trace()
+		if data[0] == row_name:
+			fraction_non_zero = float(data[1])
+	f.close()
+	if fraction_non_zero == -10:
+		print('assumptino eroror')
+		pdb.set_trace()
+	return fraction_non_zero
+
 
 def organize_fusion_results_in_single_data_set(data_set_name, gene_summary_file, fusion_output_dir, fusion_processed_output_dir):
 	gene_names = extract_gene_names_from_gene_summary_file(gene_summary_file)
@@ -44,11 +66,11 @@ def organize_fusion_results_in_single_data_set(data_set_name, gene_summary_file,
 	# Loop through genes
 	for gene_index, gene_name in enumerate(gene_names):
 		# Stem of fusion results corresponding to this gene
-		fusion_stem = fusion_output_dir + data_set_name + '_' + gene_name + '_1KG_only_fusion_output.'
+		fusion_stem = fusion_output_dir + data_set_name + '_' + gene_name + '_1KG_only_fusion_output'
 		# File containing hsq
-		hsq_file = fusion_stem + 'hsq'
+		hsq_file = fusion_stem + '.hsq'
 		# File containing gene fit model (only run if hsq is sig)
-		gene_fit_file = fusion_stem + 'wgt.RDat'
+		gene_fit_file = fusion_stem + '_fraction_nonzero_weights.txt'
 
 		# First check if fusion was even run on this gene
 		if os.path.exists(hsq_file) == False:
@@ -61,6 +83,8 @@ def organize_fusion_results_in_single_data_set(data_set_name, gene_summary_file,
 
 		# Gene fit model was run
 		if os.path.exists(gene_fit_file):
+			'''
+			# old
 			# First convert RData weights file to tsv
 			new_gene_fit_file = fusion_stem + 'wgt.tsv'
 			convert_gene_fit_file_from_rdata_to_csv(gene_fit_file, new_gene_fit_file)
@@ -68,7 +92,8 @@ def organize_fusion_results_in_single_data_set(data_set_name, gene_summary_file,
 			gene_weights = (np.loadtxt(new_gene_fit_file,dtype=str)[:,1]).astype(float)
 			# Fraction non-zero weights
 			fraction_non_zero = sum(gene_weights != 0.0)/len(gene_weights)
-
+			'''
+			fraction_non_zero = extract_fraction_non_zero_from_gene_fit(gene_fit_file, '0.1')
 			# Write to ouptut file
 			t.write(gene_name + '\t' + str(h2) + '\t' + str(h2_err) + '\t' + str(h2_p) + '\t' + str(fraction_non_zero) + '\n')
 			# Append to array
