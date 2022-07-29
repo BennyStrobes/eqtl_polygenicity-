@@ -5,11 +5,50 @@
 #SBATCH --nodes=1
 
 
+
 processed_genotype_dir="$1"
-genotype_input_vcf_file="$2"
+genotype_data_dir="$2"
+filtered_sample_info_file="$3"
 
 
-sc_rna_seq_individual_file=$processed_genotype_dir"sc_rna_seq_ea_individual_list.txt"
+plink_format_filter_sample_info_file=$processed_genotype_dir"plink_formatted_filtered_sample_info.txt"
+python3 extract_ordered_individuals_in_plink_format.py $filtered_sample_info_file $plink_format_filter_sample_info_file
+
+
+plink2 --pfile $genotype_data_dir"inds_v2_header.maf10" --threads 1 --keep $plink_format_filter_sample_info_file --indiv-sort f $plink_format_filter_sample_info_file --maf .1 --make-pgen --out $processed_genotype_dir"inds_v2_sample_filter"
+
+
+plink2 --pfile $processed_genotype_dir"inds_v2_sample_filter" --threads 1 --freq --out $processed_genotype_dir"inds_v2_sample_filter_frq"
+
+
+plink2 --pfile $processed_genotype_dir"inds_v2_sample_filter" --indep-pairwise 200 50 0.25 --out $processed_genotype_dir"inds_v2_sample_filter_independent_snps"
+
+
+plink2 --pfile $processed_genotype_dir"inds_v2_sample_filter" --extract $processed_genotype_dir"inds_v2_sample_filter_independent_snps.prune.in" --pca 3 --out $processed_genotype_dir"inds_v2_sample_filter_ind_snp_pcs"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+################
+# OLD
+################
+
+
 
 #########################
 # Filter vcf file to individuals we have sc-rna-seq for

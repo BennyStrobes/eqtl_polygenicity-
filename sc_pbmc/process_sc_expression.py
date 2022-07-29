@@ -1,10 +1,11 @@
+import sys
+sys.path.remove('/n/app/python/3.7.4-ext/lib/python3.7/site-packages')
 import numpy as np 
 import os
-import sys
 import pdb
+import scanpy as sc
 import h5py
 from sklearn.decomposition import PCA
-import scanpy as sc
 from anndata import AnnData
 from sklearn.metrics.pairwise import euclidean_distances
 from sklearn.linear_model import LinearRegression
@@ -19,7 +20,7 @@ import scipy.io
 # Command line args
 ######################
 input_h5py_file = sys.argv[1]
-input_h5py_scran_file = sys.argv[2]
+input_h5py_pseudobulk_file = sys.argv[2]
 processed_sc_expression_dir = sys.argv[3]
 
 ######################
@@ -33,6 +34,9 @@ regress_out_batch = 'True'
 ########################
 # Get QC metrics
 adata = sc.read_h5ad(input_h5py_file)
+
+adata_pb = sc.read_h5ad(input_h5py_pseudobulk_file)
+pdb.set_trace()
 # Extract qc metrics for each cell
 qc_metrics = sc.pp.calculate_qc_metrics(adata.raw)[0]
 
