@@ -41,6 +41,8 @@ pseudobulk_expression_dir=$output_root"pseudobulk_expression/"
 polygenecity_analysis_input_dir=$scratch_output_root"polygenecity_analysis_input/"
 # Processed single cell pseudobulk expression
 polygenecity_analysis_results_dir=$output_root"polygenecity_analysis_results/"
+# Visualize polygenecity analysis
+visualize_polygenecity_results_dir=$output_root"visualize_polygenecity_results/"
 
 
 
@@ -89,6 +91,8 @@ fi
 
 # Each line in this file is a data set. loop through it
 data_set_summary_file=$pseudobulk_expression_dir"cell_type_matched_pseudobulk_data_set_summary_final.txt"
+data_set_summary_file=$pseudobulk_expression_dir"cell_type_matched_pseudobulk_data_set_summary_final_temp.txt"
+data_set_summary_file=$pseudobulk_expression_dir"cell_type_matched_pseudobulk_data_set_summary_final.txt"
 if false; then
 sed 1d $data_set_summary_file | while read data_set_name cluster_method_name cluster_name pseudobulk_expression_file covariate_file num_donors num_genes num_cells_per_individual_file gene_info_file plink_individual_file plink_covariate_file; do
 	echo $data_set_name
@@ -123,8 +127,6 @@ sed 1d $data_set_summary_file | while read data_set_name cluster_method_name clu
 done
 fi
 
-
-
 data_set_summary_file=$pseudobulk_expression_dir"pseudobulk_data_set_summary_final.txt"
 gene_heritability_normalization="False"
 if false; then
@@ -150,8 +152,39 @@ fi
 
 
 
+#####################
+# eqtl polygenecity
+#####################
+data_set_summary_file=$pseudobulk_expression_dir"cell_type_matched_pseudobulk_data_set_summary_final.txt"
+gene_heritability_normalization="True"
+if false; then
+sed 1d $data_set_summary_file | while read data_set_name cluster_method_name cluster_name pseudobulk_expression_file covariate_file num_donors num_genes num_cells_per_individual_file gene_info_file plink_individual_file plink_covariate_file; do
+	data_set_gene_info_file=$polygenecity_analysis_input_dir$data_set_name"/"$data_set_name"_organized_gene_info_non_negative_h2.txt"
+	output_root=$polygenecity_analysis_results_dir$data_set_name"_polygenecity_results_non_negative_h2_gene_h2_norm_"$gene_heritability_normalization"_"
+	sbatch run_polygenecity_analysis.sh $data_set_name $data_set_gene_info_file $output_root $gene_heritability_normalization
+done
+fi
+
+#####################
+# eqtl polygenecity
+#####################
+data_set_summary_file=$pseudobulk_expression_dir"cell_type_matched_pseudobulk_data_set_summary_final.txt"
+gene_heritability_normalization="False"
+if false; then
+sed 1d $data_set_summary_file | while read data_set_name cluster_method_name cluster_name pseudobulk_expression_file covariate_file num_donors num_genes num_cells_per_individual_file gene_info_file plink_individual_file plink_covariate_file; do
+	data_set_gene_info_file=$polygenecity_analysis_input_dir$data_set_name"/"$data_set_name"_organized_gene_info_non_negative_h2.txt"
+	output_root=$polygenecity_analysis_results_dir$data_set_name"_polygenecity_results_non_negative_h2_gene_h2_norm_"$gene_heritability_normalization"_"
+	sbatch run_polygenecity_analysis.sh $data_set_name $data_set_gene_info_file $output_root $gene_heritability_normalization
+done
+fi
 
 
+
+if false; then
+source ~/.bash_profile
+module load R/3.5.1
+fi
+Rscript visualize_polygenecity_results.R $visualize_polygenecity_results_dir $polygenecity_analysis_results_dir
 
 
 

@@ -185,7 +185,7 @@ def inference(gene_df, variance_grid, gene_to_beta_mu, gene_to_Z, gene_to_residu
 		expected_var = np.sum(variance_grid*delta_expected)
 		excess_kurtosis = compute_excess_kurtosis_from_mixture_of_gaussians(delta_expected, variance_grid)
 
-		if np.mod(itera, 5) == 0:
+		if np.mod(itera, 20) == 0:
 			delta_expected_output_file = output_root + 'temp_' + str(itera) + '_delta_expected.txt'
 			np.savetxt(delta_expected_output_file, np.vstack((variance_grid.astype(str), delta_expected.astype(str))), fmt="%s", delimiter='\t')
 			kurtosis_output_file = output_root + 'temp_' + str(itera) + '_expected_kurtosis.txt'

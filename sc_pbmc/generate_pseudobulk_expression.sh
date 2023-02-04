@@ -2,7 +2,7 @@
 #SBATCH -c 1                               # Request one core
 #SBATCH -t 0-5:00                         # Runtime in D-HH:MM format
 #SBATCH -p short                           # Partition to run in
-#SBATCH --mem=200GB                         # Memory total in MiB (for all cores)
+#SBATCH --mem=20GB                         # Memory total in MiB (for all cores)
 
 
 
@@ -19,9 +19,9 @@ fi
 
 
 
-
+if false; then
 python3 generate_cell_type_matched_pseudobulk_expression.py $processed_sc_expression_dir $input_h5py_file $processed_genotype_dir $pseudobulk_expression_dir $gene_annotation_file
-
+fi
 
 
 

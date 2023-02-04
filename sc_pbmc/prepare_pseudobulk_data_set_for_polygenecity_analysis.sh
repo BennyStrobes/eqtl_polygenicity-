@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH -c 1                               # Request one core
-#SBATCH -t 0-40:00                         # Runtime in D-HH:MM format
+#SBATCH -t 0-60:00                         # Runtime in D-HH:MM format
 #SBATCH -p medium                           # Partition to run in
-#SBATCH --mem=10GB                         # Memory total in MiB (for all cores)
+#SBATCH --mem=25GB                         # Memory total in MiB (for all cores)
 
 
 
@@ -11,7 +11,7 @@ pseudobulk_expression_file="$2"
 covariate_file="$3"
 gene_info_file="$4"
 plink_individual_file="$5"
-polygenecity_analysis_input_dir="$6"
+polygenecity_analysis_input_dir_root="$6"
 processed_genotype_dir="$7"
 
 
@@ -20,6 +20,10 @@ gcta_path="/n/groups/price/tiffany/subpheno/fusion_twas-master/gcta_nr_robust"
 
 module load R/3.5.1
 
+
+polygenecity_analysis_input_dir=$polygenecity_analysis_input_dir_root$data_set_name"/"
+
+mkdir $polygenecity_analysis_input_dir
 
 
 

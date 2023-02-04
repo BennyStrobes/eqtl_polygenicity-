@@ -155,8 +155,7 @@ def generate_random_repeat_pseudobulk_expression(cell_indi_arr, num_genes, sc_ex
 
 		num_true = np.sum(cells_to_individual_boolean)
 		true_arr = np.asarray([False]*num_true)
-		true_arr[np.random.choice(np.arange(num_cells_in_indi), size=num_cells_in_indi, replace=False)] = True
-
+		true_arr[np.random.choice(np.arange(num_true), size=num_cells_in_indi, replace=False)] = True
 		cells_to_individual_boolean[cells_to_individual_boolean] = true_arr
 
 		if len(np.unique(cell_indi_arr[cells_to_individual_boolean])) != 1:
